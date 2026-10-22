@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Page - Handloom Automation</title>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"> -->
+    <link rel="stylesheet" href="style1.css" type="text/css">
+    <style>
+        
+        .section-title {
+            text-align: center;
+            margin: 10px 0 20px 0;
+            font-size: 18px;
+            letter-spacing: 3px;
+        }
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 60px;
+            height: 3px;
+            margin: 8px auto 0 auto;
+            background: #d1a94b;
+        } 
+
+        /* ---------- Pie charts ---------- */
+        .charts {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .chart {
+            display: inline-block;
+            width: 31%;
+            margin: 1%;
+            padding: 16px;
+            background: white;
+            border-top: 4px solid #d1a94b;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            vertical-align: top;
+        }
+        .chart h3 { margin: 0; font-size: 16px; }
+        .chart p { margin: 18px 0 0 0; font-size: 13px; color: #55646b; }
+
+        /* 3D pie */
+        .pie {
+            width: 140px;
+            height: 140px;
+            margin: -18px auto -22px auto;
+            border-radius: 50%;
+            /* tilt the circle backwards = 3D look */
+            transform: perspective(600px) rotateX(55deg);
+            /* stacked shadows = thickness (the side of the pie) */
+            box-shadow:
+                0 2px 0 #14363f, 0 4px 0 #14363f, 0 6px 0 #14363f, 0 8px 0 #a9d1dd,
+                0 10px 0 #14363f, 0 12px 0 #14363f, 0 14px 0 #14363f,
+                0 28px 25px rgba(0, 0, 0, 0.35);
+            transition: transform 0.7s; 
+        }
+        /* pie tilts a little more when the mouse is over the card */
+        .chart:hover .pie {
+            transform: perspective(600px) rotateX(35deg);
+        }
+
+        /* ---------- Labour cards ---------- */
+        .id-cards {
+            max-width: 780px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .id-card {
+            display: inline-block;
+            width: 230px;
+            margin: 8px;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+            text-align: left;
+            cursor: pointer;
+            color: #1f2a30;
+        }
+        .id-card:hover { 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28); 
+        }
+        .name { 
+            font-size: 17px; 
+            font-weight: 600; 
+        }
+        .status {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 3px 12px;
+            background: white;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        /* Card colours for each status */
+        .green  { background: #d9f5e1; border-left: 8px solid #27ae60; }   
+        .yellow { background: #fff4b8; border-left: 8px solid #f1c40f; }   
+        .red    { background: #ffdcdc; border-left: 8px solid #e74c3c; }   
+
+        /* ---------- Assign work form ---------- */
+        .form-box {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 26px;
+            background: white;
+            border-top: 4px solid #d1a94b;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        }
+        .form-box h2 { margin-top: 0; }
+        label {
+            display: block;
+            margin-top: 14px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            font-family: inherit;
+            border: 1px solid #d9cfba;
+            border-radius: 6px;
+        }
+        button {
+            margin: 16px 8px 0 0;
+            padding: 11px 20px;
+            background: #1f5f6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        button.back {
+            margin: 0 0 16px 0;
+            padding: 0;
+            background: none;
+            color: #1f5f6b;
+            font-weight: 600;
+        }
+        
+        table { width: 100%; margin-top: 10px; /*border-collapse: collapse;*/ }
+        th, td { padding: 9px; border: 1px solid #d9cfba; text-align: left; }
+        th { background: #1f5f6b; color: white; }
+        .message { color: #1f8a4c; font-weight: 600; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Handloom Automation</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h2>Manager Dashboard</h2>
+        <div class="zari"></div>
+        <p>Track raw material, tasks and labour work in one place.</p>
+    </div>
+
+    <main>
+        <!-- Page A: Dashboard -->
+        <div id="dashboard">
+            <div class="charts">
+                <div class="chart"><h3>Raw Material</h3><div class="pie" id="pie1"></div><p id="text1"></p></div>
+                <div class="chart"><h3>Task Panel</h3><div class="pie" id="pie2"></div><p id="text2"></p></div>
+                <div class="chart"><h3>Labour Utilization</h3><div class="pie" id="pie3"></div><p id="text3"></p></div>
+            </div>
+            <h2 class="section-title">LABOURS</h2>
+            <div class="id-cards" id="cards"></div>
+        </div>
+
+        <!-- Page B: Assign work -->
+        <div id="assign" style="display:none">
+            <button class="back" id="backBtn">&lt; Back to dashboard</button>
+            <div class="form-box">
+                <h2>Assign Work</h2>
+                <p>Labour Name: <b id="aName"></b></p>
+                <p>Labour ID: <b id="aId"></b></p>
+
+                <label>Material type</label>
+                <select id="aType"><option>Silk</option><option>Cotton</option></select>
+
+                <label>Raw material (number of sarees)</label>
+                <input id="aSarees" type="number" value="10" readonly>
+
+                <label>Assigned date</label>
+                <input id="aAssigned" type="date">
+
+                <label>Completion date</label>
+                <input id="aCompletion" type="date">
+
+                <button id="saveBtn">Save assignment</button>
+                <button id="doneBtn">Mark completed</button>
+                <p class="message" id="aMessage"></p>
+
+                <h3 style="margin-top:22px">Salary</h3>
+                <table id="aSalary"></table>
+                <label for="payDate">Payment date</label>
+                <input id="payDate" type="date">
+                <label for="payAmount">Amount</label>
+                <input id="payAmount" type="number">
+                <button id="payBtn">Add payment</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+    &copy; 2026 Co-Operative Handloom Automation System. All Rights Reserved.
+    | <a href="#" id="resetLink" style="color:#f3e6c0">Reset data</a>   <!-- NEW -->
+    </footer>
+
+    <script id="labourData" type="application/json">
+    {
+      "labours": [
+        { "id": "H001", "name": "Praveen", "materialType": "Silk", "sarees": 10, "assignedDate": "2026-09-22", "completionDate": "2026-10-23", "completed": false, "salary": [ { "date": "2026-10-24", "amount": 10000 } ] },
+        { "id": "H002", "name": "Meena", "materialType": "Cotton", "sarees": 10, "assignedDate": "2026-09-25", "completionDate": "2026-10-20", "completed": true, "salary": [ { "date": "2026-10-21", "amount": 9000 } ] },
+        { "id": "H003", "name": "Karthik", "materialType": "", "sarees": 0, "assignedDate": "", "completionDate": "", "completed": false, "salary": [] },
+        { "id": "H004", "name": "Lakshmi", "materialType": "Silk", "sarees": 10, "assignedDate": "2026-09-28", "completionDate": "2026-10-26", "completed": true, "salary": [ { "date": "2026-10-27", "amount": 11000 } ] },
+        { "id": "H005", "name": "Suresh", "materialType": "", "sarees": 0, "assignedDate": "", "completionDate": "", "completed": false, "salary": [] },
+        { "id": "H006", "name": "Divya", "materialType": "", "sarees": 0, "assignedDate": "", "completionDate": "", "completed": false, "salary": [] }
+      ]
+    }
+    </script>
+
+    <script>
+        function startApp() {
+
+            const totalMaterial = 150;
+            const sareeCount = 10;
+
+            // ---------- Load the data ----------
+            // 1) Look in the browser's saved storage first
+            // 2) If nothing is saved yet, use the JSON from this page
+            const savedText = localStorage.getItem("labours");
+            let labours;
+            if (savedText) {
+                labours = JSON.parse(savedText);
+            } else {
+                const jsonText = document.getElementById("labourData").textContent;
+                labours = JSON.parse(jsonText).labours;
+            }
+
+            let current = 0;   // which labour we are editing (0 = first)
+
+            // ---------- Save the data ----------
+            // The Labour page reads this same "labours" storage
+            function saveData() {
+                localStorage.setItem("labours", JSON.stringify(labours));
+            }
+
+            // Colour one pie and give back the percent
+            function drawPie(pieId, part, total) {
+                let percent = 0;
+                if (total > 0) {
+                    percent = Math.round(part / total * 100);
+                }
+                const pie = document.getElementById(pieId);
+                pie.style.background =
+                    "conic-gradient(#27ae60 0% " + percent + "%, #f39c12 " + percent + "% 100%)";
+                return percent;
+            }
+
+            function showCharts() {
+
+                // Count everything from the labour data
+                let issuedMaterial = 0;   // total sarees given to labours
+                let issuedLabours = 0;    // labours who got work
+                let completedTasks = 0;   // labours who finished
+                let workingLabours = 0;   // labours still working
+
+                for (let i = 0; i < labours.length; i++) {
+                    if (labours[i].sarees > 0) {
+                        issuedMaterial = issuedMaterial + labours[i].sarees;
+                        issuedLabours = issuedLabours + 1;
+                        if (labours[i].completed == true) {
+                            completedTasks = completedTasks + 1;
+                        } else {
+                            workingLabours = workingLabours + 1;
+                        }
+                    }
+                }
+                const totalLabours = labours.length;
+
+                // Pie 1: Raw Material
+                const percent1 = drawPie("pie1", issuedMaterial, totalMaterial);
+                document.getElementById("text1").innerHTML =
+                    percent1 + "% Issued (" + issuedMaterial + " of " + totalMaterial + ")";
+
+                // Pie 2: Task Panel
+                const percent2 = drawPie("pie2", completedTasks, issuedLabours);
+                document.getElementById("text2").innerHTML =
+                    percent2 + "% Completed (" + completedTasks + " of " + issuedLabours + ")";
+
+                // Pie 3: Labour Utilization
+                drawPie("pie3", workingLabours, totalLabours);
+                document.getElementById("text3").innerHTML =
+                    workingLabours + " working, " + (totalLabours - workingLabours) + " not working";
+            }
+
+            function showDashboard() {
+                showCharts();   // refresh the pies every time we come back
+
+                const cardsBox = document.getElementById("cards");
+                cardsBox.innerHTML = "";
+
+                // Make one card for each labour
+                for (let j = 0; j < labours.length; j++) {
+                    const l = labours[j];
+
+                    // Decide the status text AND the card colour
+                    let status = "Not assigned";
+                    let color = "red";
+                    if (l.sarees > 0) {
+                        status = "In progress";
+                        color = "yellow";
+                        if (l.completed == true) {
+                            status = "Completed";
+                            color = "green";
+                        }
+                    }
+
+                    const card = document.createElement("div");
+                    card.className = "id-card " + color;
+                    card.innerHTML = '<div class="name">' + l.name + "</div>" +
+                                     "Labour ID: " + l.id + "<br>" +
+                                     '<span class="status">' + status + "</span>";
+                    card.onclick = function () {
+                        showAssign(j);
+                    };
+                    cardsBox.appendChild(card);
+                }
+
+                document.getElementById("dashboard").style.display = "block";
+                document.getElementById("assign").style.display = "none";
+            }
+
+            function showSalary() {
+                const salary = labours[current].salary;
+                let rows = "<tr><th>Date</th><th>Amount</th></tr>";
+
+                for (let i = 0; i < salary.length; i++) {
+                    rows = rows + "<tr><td>" + salary[i].date + "</td><td>" + salary[i].amount + "</td></tr>";
+                }
+
+                if (salary.length == 0) {
+                    rows = rows + '<tr><td colspan="2">No payments yet</td></tr>';
+                }
+                document.getElementById("aSalary").innerHTML = rows;
+            }
+
+            function showAssign(number) {
+                current = number;
+                const l = labours[current];
+
+                document.getElementById("aName").innerHTML = l.name;
+                document.getElementById("aId").innerHTML = l.id;
+                document.getElementById("aAssigned").value = l.assignedDate;
+                document.getElementById("aCompletion").value = l.completionDate;
+                document.getElementById("aSarees").value = sareeCount;
+
+                if (l.sarees == 0) {
+                    document.getElementById("aType").value = "Silk";
+                } else {
+                    document.getElementById("aType").value = l.materialType;
+                }
+
+                if (l.completed == true) {
+                    document.getElementById("doneBtn").innerHTML = "Reopen task";
+                } else {
+                    document.getElementById("doneBtn").innerHTML = "Mark completed";
+                }
+
+                showSalary();
+                document.getElementById("aMessage").innerHTML = "";
+
+                document.getElementById("dashboard").style.display = "none";
+                document.getElementById("assign").style.display = "block";
+            }
+
+            function saveAssignment() {
+                labours[current].materialType = document.getElementById("aType").value;
+                labours[current].sarees = sareeCount;
+                labours[current].assignedDate = document.getElementById("aAssigned").value;
+                labours[current].completionDate = document.getElementById("aCompletion").value;
+                saveData();   // save so the Labour page can see it
+                document.getElementById("aMessage").innerHTML = "Assignment saved";
+            }
+
+            function toggleCompleted() {
+                if (labours[current].completed == true) {
+                    labours[current].completed = false;
+                    saveData();
+                    showAssign(current);
+                    document.getElementById("aMessage").innerHTML = "Task reopened";
+                } else {
+                    labours[current].completed = true;
+                    saveData();
+                    showAssign(current);
+                    document.getElementById("aMessage").innerHTML = "Marked completed";
+                }
+            }
+
+            function addPayment() {
+                const date = document.getElementById("payDate").value;
+                const amount = Number(document.getElementById("payAmount").value);
+
+                if (date == "" || amount == 0) {
+                    document.getElementById("aMessage").innerHTML = "Enter date and amount";
+                    return;
+                }
+
+                labours[current].salary.push({ date: date, amount: amount });
+                saveData();   // save so the Labour page can see the salary
+                showAssign(current);
+                document.getElementById("aMessage").innerHTML = "Payment added";
+            }
+
+            // Connect the buttons
+            document.getElementById("backBtn").onclick = showDashboard;
+            document.getElementById("saveBtn").onclick = saveAssignment;
+            document.getElementById("doneBtn").onclick = toggleCompleted;
+            document.getElementById("payBtn").onclick = addPayment;
+
+            // <-- NEW: Reset data link
+            function resetData() {
+                localStorage.removeItem("labours");
+                location.reload();
+            }
+            document.getElementById("resetLink").onclick = function () {
+                resetData();
+                return false;
+            };
+
+            // Start
+            showDashboard();
+        }
+
+        startApp();
+    </script>
+</body>
+</html>
